@@ -25,18 +25,28 @@ read the documentation below carefully for information on the new
 structure and expanded functionality. With this release, all documented
 endpoints are implemented and all endpoint methods are available.
 
+### Upgrading from v2.0.x
+
+The order of arguments for initializing the Mailchimp API has been
+reversed starting in 2.1.0 as the username is an optional argument for
+basic auth. Please reverse the order of your arguments or remove the
+username argument entirely. The name of the authentication argument has
+also changed from `mc_secret` to `mc_api`.
+
 ### History
 
-Up to date with [changelog](http://developer.mailchimp.com/documentation/mailchimp/guides/changelog/) features listed thru 1/12/2017.
+Up to date with [changelog](http://developer.mailchimp.com/documentation/mailchimp/guides/changelog/)
+features listed thru 2/23/2017.
 
 ### Initialization
 
-Grab `YOUR_SECRET_KEY` from your mailchimp account (Account > Extra > Api
-Keys). `YOUR_USERNAME` is the one you use to login.
+Grab `YOUR_API_KEY` from your mailchimp account (Account > Extra > Api
+Keys). `YOUR_USERNAME` is the one you use to login on the website and
+is optional.
 
     from mailchimp3 import MailChimp
 
-    client = MailChimp('YOUR_USERNAME', 'YOUR_SECRET_KEY')
+    client = MailChimp('YOUR_API_KEY', 'YOUR_USERNAME')
 
 ### Pagination
 
