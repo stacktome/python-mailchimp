@@ -56,6 +56,14 @@ and is optional.
 
     client = MailChimp('YOUR_API_KEY', 'YOUR_USERNAME')
 
+OAuth Support
+~~~~~~~~~~~~~
+
+In addition to HTTP Basic Authentication, MailChimp supports
+authentication through OAuth2. Information on obtaining the proper
+access key can be found
+`here <http://developer.mailchimp.com/documentation/mailchimp/guides/how-to-use-oauth2/>`__.
+
 Pagination
 ~~~~~~~~~~
 
@@ -842,4 +850,3 @@ The project is licensed under the MIT License.
    :target: https://pypi.python.org/pypi/mailchimp3
 .. |MIT license| image:: https://img.shields.io/badge/licence-MIT-blue.svg
 .. |Stable| image:: https://img.shields.io/badge/status-stable-green.svg
-
