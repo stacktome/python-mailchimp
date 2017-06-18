@@ -549,7 +549,7 @@ above with the name `client`.
 
 #### Locations Report
 
-    client.reports.locations.all(campaign_id='')
+    client.reports.locations.all(campaign_id='', get_all=False)
 
 #### Sent To Reports
 
