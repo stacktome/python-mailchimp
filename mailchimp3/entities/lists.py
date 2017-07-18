@@ -61,7 +61,7 @@ class Lists(BaseApi):
                 "zip": string*,
                 "country": string*
             },
-            "permision_reminder": string*,
+            "permission_reminder": string*,
             "campaign_defaults": object*
             {
                 "from_name": string*,
@@ -224,7 +224,7 @@ class Lists(BaseApi):
                 "zip": string*,
                 "country": string*
             },
-            "permision_reminder": string*,
+            "permission_reminder": string*,
             "campaign_defaults": object*
             {
                 "from_name": string*,
