@@ -1,7 +1,6 @@
 # coding=utf-8
 """
 Mailchimp v3 Api SDK
-
 Documentation: http://developer.mailchimp.com/documentation/mailchimp/
 """
 from __future__ import unicode_literals
@@ -33,14 +32,12 @@ class MailChimpClient(object):
     """
     MailChimp class to communicate with the v3 API
     """
-    def __init__(self, mc_user, mc_secret, enabled=True, timeout=None,
-                 request_hooks=None, request_headers=None):
+    def __init__(self, mc_user=None, mc_secret=None, enabled=True, timeout=None,
+                 request_hooks=None, request_headers=None, access_token=None):
         """
         Initialize the class with you user_id and secret_key.
-
         If `enabled` is not True, these methods become no-ops. This is
         particularly useful for testing or disabling with configuration.
-
         :param mc_user: Mailchimp user id
         :type mc_user: :py:class:`str`
         :param mc_secret: Mailchimp secret key
@@ -56,13 +53,24 @@ class MailChimpClient(object):
         :param request_headers: (optional) Headers for
             :py:func:`requests.requests`.
         :type request_headers: :py:class:`dict`
+        :param access_token: OAuth2 access token
+        :type enabled: :py:class:`string`
         """
         super(MailChimpClient, self).__init__()
         self.enabled = enabled
         self.timeout = timeout
-        self.auth = HTTPBasicAuth(mc_user, mc_secret)
-        datacenter = mc_secret.split('-').pop()
-        self.base_url = 'https://{0}.api.mailchimp.com/3.0/'.format(datacenter)
+        if access_token:
+            self.auth = MailchimpOAuth(access_token)
+            try:
+                self.base_url = self.auth.get_base_url() + '/3.0/'
+            except requests.exceptions.RequestException:
+                raise Exception("Failed to successfully authenticate and obtain metadata")
+        elif mc_user and mc_secret:
+            self.auth = HTTPBasicAuth(mc_user, mc_secret)
+            datacenter = mc_secret.split('-').pop()
+            self.base_url = 'https://{}.api.mailchimp.com/3.0/'.format(datacenter)
+        else:
+            raise Exception("You must provide either access_token or a username and api_key")
         self.request_headers = request_headers or requests.utils.default_headers()
         self.request_hooks = request_hooks or requests.hooks.default_hooks()
 
@@ -79,12 +87,10 @@ class MailChimpClient(object):
 
         return response
 
-
     @_enabled_or_noop
     def _post(self, url, data=None):
         """
         Handle authenticated POST requests
-
         :param url: The url for the endpoint including path parameters
         :type url: :py:class:`str`
         :param data: The request body parameters
@@ -115,7 +121,6 @@ class MailChimpClient(object):
     def _get(self, url, **queryparams):
         """
         Handle authenticated GET requests
-
         :param url: The url for the endpoint including path parameters
         :type url: :py:class:`str`
         :param queryparams: The query string parameters
@@ -144,7 +149,6 @@ class MailChimpClient(object):
     def _delete(self, url):
         """
         Handle authenticated DELETE requests
-
         :param url: The url for the endpoint including path parameters
         :type url: :py:class:`str`
         :returns: The JSON output from the API
@@ -172,7 +176,6 @@ class MailChimpClient(object):
     def _patch(self, url, data=None):
         """
         Handle authenticated PATCH requests
-
         :param url: The url for the endpoint including path parameters
         :type url: :py:class:`str`
         :param data: The request body parameters
@@ -201,7 +204,6 @@ class MailChimpClient(object):
     def _put(self, url, data=None):
         """
         Handle authenticated PUT requests
-
         :param url: The url for the endpoint including path parameters
         :type url: :py:class:`str`
         :param data: The request body parameters
@@ -224,3 +226,31 @@ class MailChimpClient(object):
         else:
             r.raise_for_status()
             return r.json()
+
+
+class MailchimpOAuth(requests.auth.AuthBase):
+
+    def __init__(self, access_token):
+        self._access_token = access_token
+
+    def __call__(self, r):
+        r.headers['Authorization'] = 'OAuth ' + self._access_token
+        return r
+
+    def get_metadata(self):
+        try:
+            r = requests.get('https://login.mailchimp.com/oauth2/metadata', auth=self)
+        except requests.exceptions.RequestException:
+            raise
+        else:
+            r.raise_for_status()
+            rj = r.json()
+            if "error" in rj:
+                raise requests.exceptions.RequestException("Invalid token")
+            return rj
+
+    def get_base_url(self):
+        try:
+            return self.get_metadata()['api_endpoint']
+        except requests.exceptions.RequestException :
+            raise
