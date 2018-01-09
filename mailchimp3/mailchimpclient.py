@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 import functools
 
 import requests
+from requests import HTTPError
 from requests.auth import HTTPBasicAuth
 # Handle library reorganisation Python 2 > Python 3.
 try:
@@ -111,7 +112,11 @@ class MailChimpClient(object):
         except requests.exceptions.RequestException as e:
             raise e
         else:
-            r.raise_for_status()
+            try:
+                r.raise_for_status()
+            except HTTPError:
+                raise HTTPError(r.content)
+
             if r.status_code == 204:
                 return None
             return r.json()
