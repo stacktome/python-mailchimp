@@ -7,6 +7,8 @@ Schema: https://api.mailchimp.com/schema/3.0/Batches/Instance.json
 """
 from __future__ import unicode_literals
 
+from time import sleep
+
 from mailchimp3.baseapi import BaseApi
 
 
@@ -22,7 +24,6 @@ class Batches(BaseApi):
         self.endpoint = 'batches'
         self.batch_id = None
         self.operation_status = None
-
 
     def create(self, data):
         """
@@ -52,7 +53,6 @@ class Batches(BaseApi):
                 raise KeyError('The batch operation must have a path')
         return self._mc_client._post(url=self._build_path(), data=data)
 
-
     def all(self, get_all=False, **queryparams):
         """
         Get a summary of batch requests that have been made.
@@ -71,7 +71,6 @@ class Batches(BaseApi):
             return self._iterate(url=self._build_path(), **queryparams)
         else:
             return self._mc_client._get(url=self._build_path(), **queryparams)
-
 
     def get(self, batch_id, **queryparams):
         """
@@ -101,3 +100,31 @@ class Batches(BaseApi):
         self.batch_id = batch_id
         self.operation_status = None
         return self._mc_client._delete(url=self._build_path(batch_id))
+
+    def wait_for_complete(self, batch_id, retries=20):
+        """
+        Waits the batch with batch_id for completing.
+
+        :param batch_id: The unique id for the batch operation.
+        :type batch_id: :py:class:`str`
+        :param retries: Number of retries to successful complete.
+        :type retries: :py:class:`int`
+        """
+        batch = None
+        sleep_secs = 3
+
+        for _ in range(retries):
+            sleep(sleep_secs)
+
+            batch = self.get(batch_id=batch_id)
+
+            if batch['status'] == 'finished':
+                if batch['errored_operations'] > 0:
+                    raise Exception(
+                        f'{batch["errored_operations"]}/{batch["total_operations"]} operations failed,'
+                        f' details here {batch["response_body_url"]}'
+                    )
+
+                return batch
+
+        return batch
