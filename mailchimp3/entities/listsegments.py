@@ -60,8 +60,8 @@ class ListSegments(BaseApi):
         :param get_all: Should the query get all results
         :type get_all: :py:class:`bool`
         :param queryparams: The query string parameters
-        queryparams['fields'] = []
-        queryparams['exclude_fields'] = []
+        queryparams['fields'] = string (comma-separated fields), example 'segments.id,segments.name'
+        queryparams['exclude_fields'] = string (comma-separated fields)
         queryparams['count'] = integer
         queryparams['offset'] = integer
         queryparams['type'] = string
