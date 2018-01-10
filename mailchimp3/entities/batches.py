@@ -110,21 +110,20 @@ class Batches(BaseApi):
         :param retries: Number of retries to successful complete.
         :type retries: :py:class:`int`
         """
-        batch = None
         sleep_secs = 3
 
         for _ in range(retries):
-            sleep(sleep_secs)
-
             batch = self.get(batch_id=batch_id)
 
             if batch['status'] == 'finished':
                 if batch['errored_operations'] > 0:
                     raise Exception(
-                        f'{batch["errored_operations"]}/{batch["total_operations"]} operations failed,'
+                        f'{batch["errored_operations"]}/{batch["total_operations"]} operations failed for batch_id = {batch_id},'
                         f' details here {batch["response_body_url"]}'
                     )
 
                 return batch
+
+            sleep(sleep_secs)
 
         return batch
