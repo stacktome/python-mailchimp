@@ -127,3 +127,22 @@ class Batches(BaseApi):
             sleep(sleep_secs)
 
         return batch
+
+    def wait_for_many(self, batch_ids, retries=20):
+        """
+        Waits while at least one non-finished batch_id is present in `batch_ids`.
+
+        :param batch_ids: The unique batch ids.
+        :type batch_ids: :py:class:`list` of :py:class:`str`
+        :param retries: Number of retries to successful complete.
+        :type retries: :py:class:`int`
+        """
+        failed_batches = []
+        for batch_id in batch_ids:
+            try:
+                self.wait_for_complete(batch_id, retries)
+            except Exception as e:
+                failed_batches.append(str(e))
+
+        if len(failed_batches) > 0:
+            raise Exception(f'{len(failed_batches)}/{len(batch_ids)} batches failed:\n' + '\n'.join(failed_batches))
