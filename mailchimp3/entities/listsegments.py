@@ -27,7 +27,6 @@ class ListSegments(BaseApi):
         self.segment_id = None
         self.members = ListSegmentMembers(self)
 
-
     def create(self, list_id, data):
         """
         Create a new segment in a specific list.
@@ -49,7 +48,6 @@ class ListSegments(BaseApi):
         else:
             self.segment_id = None
         return response
-
 
     def all(self, list_id, get_all=False, **queryparams):
         """
@@ -77,6 +75,24 @@ class ListSegments(BaseApi):
         else:
             return self._mc_client._get(url=self._build_path(list_id, 'segments'), **queryparams)
 
+    def all_emails(self, list_id, segment_id):
+        """
+        Returns a list of all emails in the segment.
+
+        :param list_id: The unique id for the list.
+        :type list_id: :py:class:`str`
+        :param segment_id: The unique id for the segment.
+        :type segment_id: :py:class:`str`
+        """
+        return [
+            member['email_address'] for member in
+            self.all(
+                list_id=list_id,
+                segment_id=segment_id,
+                get_all=True,
+                fields='members.email_address'
+            )['members']
+        ]
 
     def get(self, list_id, segment_id, **queryparams):
         """
@@ -93,7 +109,6 @@ class ListSegments(BaseApi):
         self.list_id = list_id
         self.segment_id = segment_id
         return self._mc_client._get(url=self._build_path(list_id, 'segments', segment_id), **queryparams)
-
 
     def update(self, list_id, segment_id, data):
         """
@@ -115,7 +130,6 @@ class ListSegments(BaseApi):
             raise KeyError('The list segment must have a name')
         return self._mc_client._patch(url=self._build_path(list_id, 'segments', segment_id), data=data)
 
-
     def update_members(self, list_id, segment_id, data):
         """
         Batch add/remove list members to static segment.
@@ -134,7 +148,6 @@ class ListSegments(BaseApi):
         self.list_id = list_id
         self.segment_id = segment_id
         return self._mc_client._post(url=self._build_path(list_id, 'segments', segment_id), data=data)
-
 
     def delete(self, list_id, segment_id):
         """
