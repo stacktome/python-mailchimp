@@ -75,25 +75,6 @@ class ListSegments(BaseApi):
         else:
             return self._mc_client._get(url=self._build_path(list_id, 'segments'), **queryparams)
 
-    def all_emails(self, list_id, segment_id):
-        """
-        Returns a list of all emails in the segment.
-
-        :param list_id: The unique id for the list.
-        :type list_id: :py:class:`str`
-        :param segment_id: The unique id for the segment.
-        :type segment_id: :py:class:`str`
-        """
-        return [
-            member['email_address'] for member in
-            self.all(
-                list_id=list_id,
-                segment_id=segment_id,
-                get_all=True,
-                fields='members.email_address'
-            )['members']
-        ]
-
     def get(self, list_id, segment_id, **queryparams):
         """
         Get information about a specific segment.

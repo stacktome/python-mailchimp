@@ -25,7 +25,6 @@ class ListSegmentMembers(BaseApi):
         self.segment_id = None
         self.subscriber_hash = None
 
-
     def create(self, list_id, segment_id, data):
         """
         Add a member to a static segment.
@@ -63,7 +62,6 @@ class ListSegmentMembers(BaseApi):
             self.subscriber_hash = None
         return response
 
-
     def all(self, list_id, segment_id, get_all=False, **queryparams):
         """
         Get information about members in a saved segment.
@@ -88,6 +86,24 @@ class ListSegmentMembers(BaseApi):
         else:
             return self._mc_client._get(url=self._build_path(list_id, 'segments', segment_id, 'members'), **queryparams)
 
+    def all_emails(self, list_id, segment_id):
+        """
+        Returns a list of all emails in the segment.
+
+        :param list_id: The unique id for the list.
+        :type list_id: :py:class:`str`
+        :param segment_id: The unique id for the segment.
+        :type segment_id: :py:class:`str`
+        """
+        return [
+            member['email_address'] for member in
+            self.all(
+                list_id=list_id,
+                segment_id=segment_id,
+                get_all=True,
+                fields='members.email_address'
+            )['members']
+        ]
 
     def delete(self, list_id, segment_id, subscriber_hash):
         """
