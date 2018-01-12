@@ -53,6 +53,25 @@ class Batches(BaseApi):
                 raise KeyError('The batch operation must have a path')
         return self._mc_client._post(url=self._build_path(), data=data)
 
+    def create_sync(self, operations):
+        """
+        Creates a batch for passed `operations` and waits for finishing.
+
+        :param operations: Operations for the batch request
+        :type operations: :py:class:`list` of :py:class:`list`
+        operations = [
+            {
+                "method": string* (Must be one of "GET", "POST", "PUT", "PATCH", or "DELETE")
+                "path": string*,
+            }
+        ]
+        """
+        batch = self.create(
+            data={'operations': operations}
+        )
+
+        return self.wait_for_complete(batch['id'])
+
     def all(self, get_all=False, **queryparams):
         """
         Get a summary of batch requests that have been made.
