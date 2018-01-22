@@ -78,13 +78,13 @@ class MailChimpClient(object):
 
     def _make_request(self, **kwargs):
         _logger.info(u'{method} Request: {url}'.format(**kwargs))
-        if kwargs.get('json'):
-            _logger.info('PAYLOAD: {json}'.format(**kwargs))
+        # if kwargs.get('json'):
+        #     _logger.info('PAYLOAD: {json}'.format(**kwargs))
 
         response = requests.request(**kwargs)
 
-        _logger.info(u'{method} Response: {status} {text}'\
-            .format(method=kwargs['method'], status=response.status_code, text=response.text))
+        # _logger.info(u'{method} Response: {status} {text}'\
+        #     .format(method=kwargs['method'], status=response.status_code, text=response.text))
 
         return response
 
